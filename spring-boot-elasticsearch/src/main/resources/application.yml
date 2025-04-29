@@ -1,0 +1,10 @@
+easy-es:
+  address: 127.0.0.1:9200
+
+server:
+  port: 9990
+
+spring:
+  jackson:
+    date-format: "yyyy-MM-dd HH:mm:ss"
+    time-zone: "GMT+8"

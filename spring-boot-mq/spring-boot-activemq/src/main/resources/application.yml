@@ -1,0 +1,10 @@
+spring:
+  activemq:
+    broker-url: tcp://localhost:61616
+    user: admin
+    password: admin
+    topic-name: topic-queue-1
+    queue-name: msg-queue-1
+
+server:
+  port: 9876
