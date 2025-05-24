@@ -1,0 +1,17 @@
+spring:
+  rabbitmq:
+    username: admin
+    password: admin
+    template:
+      # 消息持久化（默认已启用，显式配置更安全）
+      default-receive-queue: persistent
+    # 生产者消息确认机制: none（默认) simple(同步确认模式) correlated(异步确认模式)
+    publisher-confirm-type: none
+    # 消息发送到交换机，但未找到匹配的队列（交换机未绑定队列，或路由键不匹配）Broker 将消息返回给生产者
+    publisher-returns: true
+    listener:
+      simple:
+        # 消费者确认模式
+        acknowledge-mode: AUTO
+server:
+  port: 9877
