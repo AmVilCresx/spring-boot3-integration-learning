@@ -15,7 +15,25 @@ public class RabbitMQController {
 
     @GetMapping("/send2direxc")
     public String sendMsgToDirectExchange(String routingKey, String message) {
-        producerService.sendMessage(routingKey, message);
-        return "ok direxc";
+        producerService.sendMessageToDirect(routingKey, message);
+        return "ok direxc: " + routingKey;
+    }
+
+    @GetMapping("/send2Topic")
+    public String sendMsgToTopicExchange(String routingKey, String message) {
+        producerService.sendMessageToTopic(routingKey, message);
+        return "ok topic :"  + routingKey;
+    }
+
+    @GetMapping("/send2Fanout")
+    public String sendMsgToFanoutExchange(String message) {
+        producerService.sendMessageToFanout(message);
+        return "ok fanout! ";
+    }
+
+    @GetMapping("/mockDeadLetter")
+    public String mockDeadLetter(String message) {
+        producerService.sendMessageForMockDeadLetter(message);
+        return "ok mockDeadLetter! ";
     }
 }

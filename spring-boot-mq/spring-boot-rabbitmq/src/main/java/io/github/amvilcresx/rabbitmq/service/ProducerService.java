@@ -1,8 +1,8 @@
 package io.github.amvilcresx.rabbitmq.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.hutool.core.data.id.IdUtil;
-import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,9 +14,10 @@ public class ProducerService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    public void sendMessage(String routingKey, String message) {
+    public void sendMessageToDirect(String routingKey, String message) {
         //                            交换机名称          路由key      消息内容（Object）
         rabbitTemplate.convertAndSend("direct.exchange", routingKey, message);
+        log.info("向直连交换机发送消息， routing key={}, message={}", routingKey, message);
 
         /*
         【 需要开启生产者确认机制 】
@@ -43,6 +44,26 @@ public class ProducerService {
         });
 
          */
+    }
+
+    public void sendMessageToTopic(String routingKey, String message) {
+        rabbitTemplate.convertAndSend("topic.exchange", routingKey, message);
+        log.info("向 【Topic 交换机】 发送消息， routing key={}, message={}", routingKey, message);
+    }
+
+
+    public void sendMessageToFanout(String message) {
+        // Fanout 交换机忽略路由键
+        rabbitTemplate.convertAndSend("fanout.exchange", "", message);
+        log.info("向 【Fanout 交换机】 发送消息  message={}", message);
+    }
+
+    public void sendMessageForMockDeadLetter(String message) {
+        MessageProperties props = new MessageProperties();
+        props.setExpiration("2000"); // 2秒
+        Message msg = new Message(message.getBytes(), props);
+        rabbitTemplate.convertAndSend("business_exchange", "business_routing_key", msg);
+        log.info("发送消息，模拟死信队列：  message={}", message);
     }
 
 }
