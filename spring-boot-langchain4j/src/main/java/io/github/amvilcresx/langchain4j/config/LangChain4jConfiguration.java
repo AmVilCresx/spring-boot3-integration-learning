@@ -7,9 +7,11 @@ import dev.langchain4j.data.document.loader.ClassPathDocumentLoader;
 import dev.langchain4j.data.document.parser.apache.pdfbox.ApachePdfBoxDocumentParser;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.http.client.spring.restclient.SpringRestClientBuilder;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.store.embedding.EmbeddingStore;
@@ -19,9 +21,12 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.dromara.hutool.core.io.file.FileNameUtil;
 import org.dromara.hutool.core.io.file.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Primary;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -40,10 +45,11 @@ public class LangChain4jConfiguration {
     /**
      * 向量模型
      */
-    @Autowired
-    private EmbeddingModel embeddingModel;
+//    @Autowired
+//    private EmbeddingModel embeddingModel;
 
     @Autowired
+    @Lazy
     private RedisEmbeddingStore redisEmbeddingStore;
 
     /**
@@ -58,9 +64,20 @@ public class LangChain4jConfiguration {
                 .build();
     }
 
+    @Bean
+    @Primary
+    public EmbeddingModel embeddingModel() {
+        return OllamaEmbeddingModel.builder()
+                .httpClientBuilder(new SpringRestClientBuilder())
+                .baseUrl("http://localhost:11434")  // Ollama 服务地址
+                .modelName("quentinz/bge-large-zh-v1.5:latest")  // 修正模型名称
+                .maxRetries(3)
+                .build();
+    }
+
     // 数据切割、向量化、存储 Bean 对象
     @Bean
-    public EmbeddingStoreIngestor embeddingStoreIngestor() {
+    public EmbeddingStoreIngestor embeddingStoreIngestor(EmbeddingModel embeddingModel) {
         // 构建向量数据库操作，基于内存存储
         //   InMemoryEmbeddingStore<TextSegment> store = new InMemoryEmbeddingStore<>();
         return EmbeddingStoreIngestor.builder()
@@ -97,7 +114,7 @@ public class LangChain4jConfiguration {
 
     // 构建向量数据库检索对象
     @Bean
-    public ContentRetriever contentRetriever(/*EmbeddingStore<TextSegment> customEmbeddingStore*/) {
+    public ContentRetriever contentRetriever(/*EmbeddingStore<TextSegment> customEmbeddingStore*/ EmbeddingModel embeddingModel) {
         return EmbeddingStoreContentRetriever.builder()
                 .embeddingStore(redisEmbeddingStore)
                 .embeddingModel(embeddingModel) // 指定向量模型
