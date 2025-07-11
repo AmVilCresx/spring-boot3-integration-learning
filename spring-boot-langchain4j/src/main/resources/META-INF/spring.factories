@@ -1,0 +1,1 @@
+org.springframework.boot.env.EnvironmentPostProcessor=io.github.amvilcresx.langchain4j.config.ExcludeEnvPostProcessor

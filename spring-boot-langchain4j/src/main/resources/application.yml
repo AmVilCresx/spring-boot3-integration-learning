@@ -23,13 +23,35 @@ langchain4j:
       api-key: ${ALI_BL_API_KEY:}
       log-requests: true
       log-responses: true
-#    embedding-model:
-#      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
-#      model-name: qwen-plus-2025-04-28
-#      api-key: ${ALI_BL_API_KEY:}
-#      log-requests: true
-#      log-responses: true
-#      max-segments-per-batch: 10
+    embedding-model:
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      model-name: qwen-plus-2025-04-28
+      api-key: ${ALI_BL_API_KEY:}
+      log-requests: true
+      log-responses: true
+      max-segments-per-batch: 10
+  # 本地 ollama
+  ollama:
+    chat-model:
+      base-url: http://localhost:11434
+      # 如果 AiService 需要使用tools属性，则这里配置的模型要支持 tools
+      model-name: okamototk/deepseek-r1:8b
+      log-requests: true
+      log-responses: true
+      timeout: 30m #本地硬件配置不好的话，timeout配置的久一点
+    streaming-chat-model:
+      base-url: http://localhost:11434
+      # 如果 AiService 需要使用tools属性，则这里配置的模型要支持 tools
+      model-name: okamototk/deepseek-r1:8b
+      timeout: 30m
+      log-requests: true
+      log-responses: true
+      temperature: 0.1
+    embedding-model:
+      base-url: http://localhost:11434
+      model-name: quentinz/bge-large-zh-v1.5:latest
+      log-requests: true
+      log-responses: true
   # 存储向量
   community:
     redis:
