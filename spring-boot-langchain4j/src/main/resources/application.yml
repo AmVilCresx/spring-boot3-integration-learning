@@ -10,6 +10,7 @@ spring:
       port: 50001
 
 langchain4j:
+  ai-mode: ollama # ollama 或者 openai
   open-ai:
     chat-model:
       base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
