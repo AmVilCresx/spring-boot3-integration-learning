@@ -5,6 +5,7 @@ import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.loader.ClassPathDocumentLoader;
 import dev.langchain4j.data.document.parser.apache.pdfbox.ApachePdfBoxDocumentParser;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
+import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatModel;
@@ -73,6 +74,10 @@ public class LangChain4jConfiguration {
                 .embeddingModel(embeddingModel)  // 指定向量模型
                 // DocumentSplitters.recursive：第一个参数：每个片段最大容纳的字符数， 第二个参数：两个片段之间重叠字符的个数。
                 .documentSplitter(DocumentSplitters.recursive(500, 100)) // 指定文档分割器
+                .textSegmentTransformer(textSegment ->
+                        // 在元信息中添加文档名称
+                        TextSegment.from(textSegment.metadata().getString("file_name") + System.lineSeparator() + textSegment.text(), textSegment.metadata())
+                )
                 .build();
     }
 
